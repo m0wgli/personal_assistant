@@ -1,6 +1,5 @@
 from pathlib import Path
 from string import punctuation
-from sys import argv
 import shutil
 
 
@@ -82,24 +81,25 @@ def delete_empty_folders(directory: Path):
 
 
 def main():
-    path_folder = input('Hello, I\'m a sorter files bot. Type path for folder, which me must to sort (like C:/Users/Admin/Unsorted):\n')
+    path_folder = input('\nВітаю! Я допоможу тобі розсортувати файли по теках. Мені потрібен шлях до папки, що я мушу відсортувати (накшталт C:/Users/Admin/Unsorted):\n')
 
     user_input = input(
-        f'Are you sure you want to sort files in "{path_folder}" ?(y/n): \n').lower()
+        f'Ти впевнений, що хочеш відсортувати файлі у теці "{path_folder}" ?(так/ні): \n').lower()
 
     match user_input:
-        case 'n':
-            print('The programm was stopped by user.')
-        case 'y':
+        case 'ні':
+            print('Виконання програми зупинено користувачем.')
+            main()
+        case 'так':
             try:
                 directory = Path(path_folder)
             except IndexError:
                 print('Must be path to folder.')
             if not directory.exists():
-                print("The folder doesn't exist.")
+                print("Такої теки не існує.")
             else:
-                unpuck_input = input("Do I need to unpack archives?(y/n): \n").lower()
-                if unpuck_input == 'y':
+                unpuck_input = input("Чи потрібно разпакувати архіви?(так/ні): \n").lower()
+                if unpuck_input == 'так':
                     create_folders(directory)
                     replace_files(directory)
                     unpack_archive(directory)

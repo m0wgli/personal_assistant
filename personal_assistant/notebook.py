@@ -22,7 +22,7 @@ class Keyword:
 
 class RecordNote:
 
-    def __init__(self, text: Text, keyword: Keyword = None):
+    def __init__(self, text: Text = None, keyword: Keyword = None):
         self.texts = [text] if text else []
         self.keywords = [keyword] if keyword else []
 
@@ -71,6 +71,7 @@ class Notebook(UserDict):
             pickle.dump(record, f)
         name_note = f"Запис {len(self.data) + 1}"
         self.data[name_note] = record
+        return 'Нотатку збережено.'
 
     def search(self, param):
         if len(param) < 3:
@@ -104,3 +105,5 @@ class Notebook(UserDict):
         for key, value in self.data.items():
             output += f"{key} {value}\n"
         return output
+
+Note_book = Notebook()
