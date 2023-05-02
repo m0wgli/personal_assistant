@@ -115,3 +115,13 @@ class Notebook(UserDict):
 
 
 Note_book = Notebook()
+# if __name__ == '__main__':
+#     key1 = Keyword('купити')
+#     text1 = Text('хліб, молоко, печиво')
+#     key2 = Keyword('прибирання')
+#     text2 = Text('помити підлогу, витерти пил')
+#     record1 = RecordNote(text=text1, keyword=key1)
+#     record2 = RecordNote(text=text2, keyword=key2)
+#     Note_book.add_record(record1)
+#     Note_book.add_record(record2)
+#     print(Note_book.show_all_notes())

@@ -82,31 +82,34 @@ def delete_empty_folders(directory: Path):
 
 def main():
     path_folder = input('\nВітаю! Я допоможу тобі розсортувати файли по теках. Мені потрібен шлях до папки, що я мушу відсортувати (накшталт C:/Users/Admin/Unsorted):\n')
+    if path_folder == '' or path_folder == 'exit':
+        return '\nВпевнений, що наступного разу тобі знадобиться моя допомога.'
+    else:
+        user_input = input(
+            f'Ти впевнений, що хочеш відсортувати файлі у теці "{path_folder}" ?(так/ні): \n').lower()
 
-    user_input = input(
-        f'Ти впевнений, що хочеш відсортувати файлі у теці "{path_folder}" ?(так/ні): \n').lower()
+        match user_input:
+            case 'ні':
+                return 'Виконання програми зупинено користувачем.'
 
-    match user_input:
-        case 'ні':
-            print('Виконання програми зупинено користувачем.')
-            main()
-        case 'так':
-            try:
-                directory = Path(path_folder)
-            except IndexError:
-                print('Must be path to folder.')
-            if not directory.exists():
-                print("Такої теки не існує.")
-            else:
-                unpuck_input = input("Чи потрібно разпакувати архіви?(так/ні): \n").lower()
-                if unpuck_input == 'так':
-                    create_folders(directory)
-                    replace_files(directory)
-                    unpack_archive(directory)
-                    delete_empty_folders(directory)
-
+            case 'так':
+                try:
+                    directory = Path(path_folder)
+                except IndexError:
+                    print('Must be path to folder.')
+                if not directory.exists():
+                    print("Такої теки не існує.")
                 else:
-                    create_folders(directory)
-                    replace_files(directory)
-                    delete_empty_folders(directory)
-                
+                    unpuck_input = input("Чи потрібно разпакувати архіви?(так/ні): \n").lower()
+                    if unpuck_input == 'так':
+                        create_folders(directory)
+                        replace_files(directory)
+                        unpack_archive(directory)
+                        delete_empty_folders(directory)
+
+                    else:
+                        create_folders(directory)
+                        replace_files(directory)
+                        delete_empty_folders(directory)
+        return 'Роботу програми завершено'
+                    
