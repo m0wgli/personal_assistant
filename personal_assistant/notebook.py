@@ -54,21 +54,7 @@ class RecordNote:
 
 class Notebook(UserDict):
 
-    def __init__(self):
-        super().__init__()
-        try:
-            with open('notebook.bin', 'rb') as f:
-                while True:
-                    try:
-                        record = pickle.load(f)
-                    except EOFError:
-                        break
-        except FileNotFoundError:
-            pass
-
     def add_record(self, record: RecordNote):
-        with open("notebook.bin", "ab") as f:
-            pickle.dump(record, f)
         name_note = f"Запис {len(self.data) + 1}"
         self.data[name_note] = record
         return f"Нотатку додано:\n\n{name_note}: {self.data[name_note]}"
@@ -112,6 +98,18 @@ class Notebook(UserDict):
         for key, value in self.data.items():
             output += f"{key} {value}\n"
         return output
+
+    def save_to_notebin(self, path="notebook.bin"):
+        with open(path, "ab") as f:
+            pickle.dump(self, f)
+
+    @staticmethod
+    def load_from_notebin(path="notebook.bin"):
+        try:
+            with open(path, "rb") as f:
+                return pickle.load(f)
+        except FileNotFoundError:
+            return Notebook()
 
 
 Note_book = Notebook()
