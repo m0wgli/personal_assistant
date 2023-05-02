@@ -22,7 +22,7 @@ class Keyword:
 
 class RecordNote:
 
-    def __init__(self, text: Text = None, keyword: Keyword = None):
+    def __init__(self, text: Text, keyword: Keyword = None):
         self.texts = [text] if text else []
         self.keywords = [keyword] if keyword else []
 
@@ -49,7 +49,7 @@ class RecordNote:
     def __repr__(self):
         join_text = ", ".join(str(text) for text in self.texts)
         join_keyword = ", ".join(str(keyword) for keyword in self.keywords)
-        return "\n" f"- {join_text}\n- Теги: {join_keyword}" "\n"
+        return "\n" f"- {join_text}\n{f'- Теги: {join_keyword}' if join_keyword else ''}" "\n"
 
 
 class Notebook(UserDict):
@@ -71,7 +71,7 @@ class Notebook(UserDict):
             pickle.dump(record, f)
         name_note = f"Запис {len(self.data) + 1}"
         self.data[name_note] = record
-        return 'Нотатку збережено.'
+        return f"Нотатку додано:\n\n{name_note}: {self.data[name_note]}"
 
     def search(self, param):
         if len(param) < 3:
@@ -86,7 +86,9 @@ class Notebook(UserDict):
         return result
 
     def delete_note(self, param):
-        keys_to_delete = [key for key in self.keys() if param in key]
+        keys_to_delete = [
+            key for key in self.keys() if param.lower() in key.lower()
+        ]
         if not keys_to_delete:
             return "Запису для видалення не знайдено. Якщо необхідно, спробуйте ще раз."
         for key in keys_to_delete:
@@ -98,12 +100,18 @@ class Notebook(UserDict):
             sorted(self.data.items(),
                    key=lambda x: str(x[1].keywords).lower()))
         self.data = sorted_data
-        return self.data
+        sorted_show = [f"{key}: {value}" for key, value in self.data.items()]
+        return '\n'.join(sorted_show)
+
+    def show_all_notes(self):
+        notes = [f"{key}: {value}" for key, value in self.data.items()]
+        return '\n'.join(notes)
 
     def __repr__(self):
         output = ""
         for key, value in self.data.items():
             output += f"{key} {value}\n"
         return output
+
 
 Note_book = Notebook()
