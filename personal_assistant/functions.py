@@ -1,19 +1,18 @@
 from datetime import datetime
 
-from notebook import NOTE_BOOK, Text, Keyword, RecordNote
-from adressbook import ADRESS_BOOK, Record, Name, Phone
-from weather_and_bank import exchange_rates, show_weather
-from sorter import main as sort_main
-from dec import input_error
-
+from personal_assistant.notebook import NOTE_BOOK, Text, Keyword, RecordNote
+from personal_assistant.adressbook import ADRESS_BOOK, Record, Name, Phone
+from personal_assistant.weather_and_bank import exchange_rates, show_weather
+from personal_assistant.sorter import main as sort_main
+from personal_assistant.dec import input_error
 
 def hello():
-    with open('hello.txt', 'rb') as fh:
+    with open('personal_assistant/hello.txt', 'rb') as fh:
         text = fh.read().decode('utf-8')
     return text
 
 def help():
-    with open('help.txt', 'rb') as fh:
+    with open('personal_assistant/help.txt', 'rb') as fh:
         text = fh.read().decode('utf-8')
     return text
 
@@ -308,7 +307,10 @@ def command_handler(text: str):
             return command
     return no_command
 
-def main(): 
+def main():
+    print(hello())
+    load_contacts()
+    load_notes()
     while True:
         user_input = input('\nТи у головному меню. Очікую команду від тебе:\n>>> ')
         command = command_handler(user_input)
@@ -316,7 +318,5 @@ def main():
         if command == close:
             raise SystemExit
             
-
 if __name__ == '__main__':
-    print(hello())
     main()
