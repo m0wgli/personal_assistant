@@ -16,8 +16,14 @@ class Keyword:
     def __init__(self, keyword):
         self.keyword = keyword
 
+    def __eq__(self, other):
+        if isinstance(other, Keyword):
+            return self.keyword == other.keyword
+        return False
+
     def __repr__(self):
         return f"{self.keyword}"
+    
 
 
 class RecordNote:
@@ -33,18 +39,13 @@ class RecordNote:
         self.keywords.append(keyword)
 
     def edit_note(self, new_text: Text):
-        self.new_texts = [new_text] if new_text else []
-        old_text = self.texts
-        new_note = self.new_texts
-        self.texts = self.new_texts
-        return f"Текст нотатки змінено з {old_text} на {new_note}"
+        if len(self.texts) > 0:
+            self.texts[0] = new_text
 
-    def edit_keyword(self, new_keyword: Keyword):
-        self.new_keywords = [new_keyword] if new_keyword else []
-        old_keyword = self.keywords
-        new_keyword = self.new_keywords
-        self.keywords = self.new_keywords
-        return f"Тег змінено з {old_keyword} на {new_keyword}"
+    def edit_keyword(self, old_keyword: Keyword, new_keyword: Keyword):
+        if old_keyword in self.keywords:
+            index = self.keywords.index(old_keyword)
+            self.keywords[index] = new_keyword
 
     def __repr__(self):
         join_text = ", ".join(str(text) for text in self.texts)
@@ -113,6 +114,7 @@ class Notebook(UserDict):
 
 
 Note_book = Notebook()
+
 # if __name__ == '__main__':
 #     key1 = Keyword('купити')
 #     text1 = Text('хліб, молоко, печиво')
