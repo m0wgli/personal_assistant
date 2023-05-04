@@ -54,9 +54,12 @@ class RecordNote:
 
 
 class Notebook(UserDict):
-
+   
     def add_record(self, record: RecordNote):
-        name_note = f"Запис {len(self.data) + 1}"
+        if self.data:
+            name_note = f"Запис {int(max(self.data.keys())[6:]) + 1}"
+        else:
+            name_note = "Запис 1"
         self.data[name_note] = record
         return f"Нотатку додано:\n\n{name_note}: {self.data[name_note]}"
 
