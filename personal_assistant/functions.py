@@ -57,6 +57,22 @@ def add_contact():
     return f'\nКонтакт {name.value} успішно створеною'
 
 
+def edit_note(notebook: Note_book, note_name: str, new_text: str) -> str:
+    for key, record in notebook.data.items():
+        if note_name == key:
+            record.edit_note(Text(new_text))
+            return f"Текст нотатки '{note_name}' змінено на '{new_text}'"
+    return f"Нотатку з ім'ям '{note_name}' не знайдено"
+
+
+def edit_keyword(notebook: Note_book, note_name: str, old_keyword: str, new_keyword: str) -> str:
+    for key, record in notebook.data.items():
+        if note_name == key:
+            record.edit_keyword(Keyword(old_keyword), Keyword(new_keyword))
+            return f"Тег нотатки '{note_name}' з '{old_keyword }' змінено на '{new_keyword}'"
+    return f"Нотатку з ім'ям '{note_name}' не знайдено"
+
+
 def note_book():
     # Note_book.load_from_bin()
     while True:
@@ -80,9 +96,14 @@ def note_book():
                 user_input = input('Що саме ти хочеш змінити? (тег чи текст нотатки)>>>')
                 match user_input:
                     case 'тег':
-                        pass
+                        name = input('name>>')
+                        old_tag = input('old tag>>')
+                        new_tag = input('new tag>>')
+                        print(edit_keyword(Note_book, name, old_tag, new_tag))
                     case 'текст':
-                        pass
+                        name = input('name>>')
+                        new_text = input('new_text>>')
+                        print(edit_note(Note_book, name, new_text))
 
             case 'search':
                 print(search_note())
