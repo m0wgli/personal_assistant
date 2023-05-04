@@ -1,6 +1,5 @@
 from collections import UserDict
 from datetime import datetime
-from pathlib import Path
 import pickle
 import re
 
@@ -25,22 +24,24 @@ class Name(Field):
     @Field.value.setter
     def value(self, value: str) -> None:
         if not value:
-            raise ValueError('The name can\'t be empty')
+            raise ValueError("Ім'я не може бути порожнім!")
         if not value.isalpha():
-            raise ValueError('Name must be a string, not decimal!')
+            raise ValueError("Ім'я повинно бути рядком, жодних чисел!")
+        if value in ADRESS_BOOK:
+            raise ValueError("Контакт з таким ім'ям вже існує!")
         self._value = value
-    
+
 
 class Phone(Field):
     def __init__(self, value):
         self.value = value
- 
+
     @Field.value.setter
     def value(self, value):
         if bool(re.match(r'^\+380\d{9}$', value)):
             self._value = [value]
         else:
-            raise ValueError('The phone must be like +380123456789')
+            raise ValueError('Номер телефону повинен бути у форматі +380123456789.')
 
 
 class Email(Field):
@@ -52,7 +53,7 @@ class Email(Field):
         if bool(re.match(r'[a-zA-Z][a-zA-Z0-9._]+@\w+\.[a-z]{2,}', value)):
             self._value = value
         else:
-            raise ValueError('Email may consist of Latin characters, numbers, and symbols . and _')
+            raise ValueError('Електронна пошта може складатись з латинських символів, цифр та символів . та _')
 
 
 class Birthday(Field):
@@ -63,83 +64,97 @@ class Birthday(Field):
     def value(self, value):
         try:
             datetime.strptime(value, "%d-%m-%Y")
-            self.__value = datetime.strptime(value, "%d-%m-%Y").date()
+            self._value = datetime.strptime(value, "%d-%m-%Y").date()
         except ValueError:
-            raise ValueError("Data is not correct. Must be dd-mm-yyyy")
-
+            raise ValueError("Дата неправильна. Повинно бути в форматі дд-мм-рррр.")
+    
 
 class Adress(Field):
     pass
 
 
-
-
 class Record:
-    def __init__(self, name, phone = None, email = None, birthday = None, address = None):
+    def __init__(self, name: Name, phone: Phone, email: Email = None, birthday: Birthday = None, address: Adress = None) -> None:
         self.name = name
-        self.records = {'phone': []}
-        self.phone = phone 
+        self.phone = phone
         self.birthday = birthday
         self.email = email
         self.address = address
 
-
-    def add_address(self, address):
-        self.records['address'] = address
-
-    def add_birthday(self, birthday):
-        self.records['birthday'] = birthday
-
+    def add_birthday(self, bd):
+        if not self.birthday:
+            self.birthday = Birthday(bd)
+            return f'\nДля контакту {self.name.value} додано день народження {bd}.\n'
+        return f'\nКонтакт {self.name.value} вже має день народження. Можливо ти хотів його змінити?\n'
 
     def add_email(self, email):
-        self.records['email'] = email
-
+        if not self.email:
+            self.email = Email(email)
+            return f'\nДля контакту {self.name.value} додано e-mail {email}.\n'
+        return f'\nКонтакт {self.name.value} вже має e-mail. Можливо ти хотів його змінити?\n'
 
     def add_phone(self, phone):
-        self.records['phone'].append(phone)
-
-
-
+        if phone in self.phone.value:
+            return f'\nКонтакт {self.name.value} вже має такий номер телефону.\n'
+        self.phone.value.append(phone)
+        return f'\nНомер телефону {phone} додано до контакту {self.name.value}.\n'
+    
+    def add_address(self, address):
+        if not self.address:
+            self.address = Adress(address)
+            return f'\nДля контакту {self.name.value} додано адресу {address}.\n'
+        return f'\nКонтакт {self.name.value} вже має адресу. Можливо ти хотів її змінити?\n'
+    
     def change_address(self, address):
-        self.records['address'] = address
+        if self.address:
+            self.address =  Adress(address)
+            return f'\nДля контакта {self.name.value} змінено адресу на {address}.\n'
+        return f'\nЩоб змінити адресу, для початку не завадило б її додати :)\n'
 
-
-    def change_birthday(self, birthday):
-        self.records['birthday'] = birthday
-
-
+    def change_birthday(self, bd):
+        if self.birthday:
+            self.birthday = Birthday(bd)
+            return f'\nДля контакта {self.name.value} змінено день народження на {bd}.\n'
+        return f'\nЩоб змінити день народження, для початку не завадило б його додати :)\n'
+    
     def change_email(self, email):
-        self.records['email'] = email
-
-
+        if self.email:
+            self.email = Email(email)
+            return f'\nДля контакта {self.name.value} змінено e-mail на {email}.\n'
+        return f'\nЩоб змінити імейл, для початку не завадило б його додати :)\n'
+    
     def change_phone(self, old_phone, new_phone):
-        if old_phone in self.records['phone']:
-            index = self.records['phone'].index(old_phone)
-            self.records['phone'][index] = new_phone
-            print(f"Changed {old_phone} to {new_phone}")
+        if old_phone in self.phone.value:
+            self.phone.value.remove(old_phone)
+            self.phone.value.append(new_phone)
+            return f'\nУ контакта {self.name.value} телефон {old_phone} змінено на {new_phone}.\n'
         else:
-            print(f"{old_phone} not found in self.records")
-
-
+            return f'\nТи впевнений, що саме цей номер {old_phone}? Я його не знайшов.\n'
 
     def delete_address(self):
-        del self.records['address']
-
+        if self.address:
+            self.address = None
+            return f'\nУ контакта {self.name.value} видалено адресу.\n'
+        return f'\nЯ впорався. У контакта {self.name.value} не було данних для видалення.\n'
 
     def delete_birthday(self):
-        del self.records['birthday']
-
+        if self.birthday:
+            self.birthday = None
+            return f'\nЯ видалив день народження контакта {self.name.value}.\n'
+        return f'\nЯ впорався. У контакта {self.name.value} не було данних для видалення.\n'
 
     def delete_email(self):
-        del self.records['email']
-
-
+        if self.email:
+            self.email = None
+            return f'\nЯ видалив імейл контакта {self.name.value}.\n'
+        return f'\nЯ впорався. У контакта {self.name.value} не було данних для видалення.\n'
+        
     def delete_phone(self, phone):
-        if phone in self.records['phone']:
-            self.records['phone'].remove(phone)
-            print(f"Deleted {phone}")
+        if phone in self.phone.value:
+            self.phone.value.remove(phone)
+            return f'\nЯ видалив {phone} у контакта {self.name.value}.\n'
         else:
-            print(f"{phone} not found in self.records")
+            return f'\nТи впевнений, що саме цей номер {phone}? Я його не знайшов.\n'
 
 
     # def days_to_birthday(self, birthday):
@@ -162,24 +177,29 @@ class Record:
 
 
 class AddressBook(UserDict):
-    def add_record(self, record):
-        name = record.name
+    def add_record(self, record: Record):
+        name = record.name.value
         self.data[name] = record
+        return f'Контакт {name} додано до записної книги.'
     
-    def del_record(self, record):
-        name = record.name
-        self.data.pop(name)
-
-    def save_to_bin(self, path="AddressBook.bin"):
-        with open(path, "ab") as f:
-            pickle.dump(self, f)
+    def del_record(self, record: Record):
+        name = record.name.value
+        del ADRESS_BOOK[name]
+        return f'Контакт {name} видалено з записної книги.'
+    
+    def save_to_bin(self, path="addressbook.bin"):
+        with open(path, "wb") as f:
+            pickle.dump(self.data, f)
 
     @staticmethod
-    def load_from_bin(path="AddressBook.bin"):
-        if Path(path).exists():
+    def load_from_bin(path="addressbook.bin"):
+        try:
             with open(path, "rb") as f:
                 return pickle.load(f)
-        else:
-            return AddressBook()
+        except FileNotFoundError:
+            return ADRESS_BOOK
+        except EOFError:
+            return ADRESS_BOOK
         
-Adress_book = AddressBook()
+
+ADRESS_BOOK = AddressBook()

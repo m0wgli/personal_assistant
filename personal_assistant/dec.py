@@ -6,6 +6,6 @@ def input_error(func):
         try:
             return func(*args)
         except (KeyError, ValueError, IndexError) as exc:
-            result = f"An error occurred: {str(exc)}"
+            result = f"Я повернув тебе назад в меню тому що: {str(exc)}"
             return result
     return wrapper
