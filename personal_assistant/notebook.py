@@ -101,7 +101,7 @@ class Notebook(UserDict):
         return output
 
     def save_to_notebin(self, path="notebook.bin"):
-        with open(path, "ab") as f:
+        with open(path, "wb") as f:
             pickle.dump(self, f)
 
     @staticmethod
@@ -110,10 +110,12 @@ class Notebook(UserDict):
             with open(path, "rb") as f:
                 return pickle.load(f)
         except FileNotFoundError:
-            return Notebook()
+            return NOTE_BOOK
+        except EOFError:
+            return NOTE_BOOK
 
 
-Note_book = Notebook()
+NOTE_BOOK = Notebook()
 
 # if __name__ == '__main__':
 #     key1 = Keyword('купити')
